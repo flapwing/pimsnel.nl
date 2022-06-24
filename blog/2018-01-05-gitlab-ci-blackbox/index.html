@@ -1,0 +1,192 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><base href=https://pimsnel.nl/><title>Pim Snel</title><link href=https://pimsnel.nl/main.dc43b.css rel=stylesheet><link href=https://pimsnel.nl/style.css rel=stylesheet><link rel=apple-touch-icon sizes=180x180 href=https://pimsnel.nl/apple-touch-icon.png><link rel=icon type=image/png sizes=32x32 href=https://pimsnel.nl/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=https://pimsnel.nl/favicon-16x16.png><link rel=manifest href=https://pimsnel.nl/site.webmanifest><link rel=mask-icon href=https://pimsnel.nl/safari-pinned-tab.svg color=#5bbad5><meta name=msapplication-TileColor content="#da532c"><meta name=theme-color content="#ffffff"><link href=https://pimsnel.nl/fonts.css rel=stylesheet><style>.debugprint_wrap{padding:20px;display:inline-block;margin:10px auto;border-radius:5px;border:2px solid #ddd}.debugprint td,.debugprint th{padding-left:4px;padding-right:4px}.debugprint th{border-bottom:1px solid #ddd;padding-bottom:10px;margin-bottom:10px}.debugprint tr{padding:5px 10px}.debugprint .key{font-weight:700}.debugprint .type{font-size:.9em;font-family:monospace;font-style:italic}.debugprint .value{font-family:monospace}.debugprint .true{color:green}.debugprint .false{color:red}.debugprint th.key,.debugprint th.type,.debugprint th.value{font-family:helvetica,arial,san-serif;text-transform:uppercase;letter-spacing:1px;font-size:1em;font-style:normal}</style></head><body class="pimsnel-type-artikel pimsnel-kind-page"><div class=container-fluid><div class="row pimsnel-header"><div class=col-md-4></div><div class=col-md-4></div><div class=col-md-4></div></div></div><div class=container><div class="row pimsnel-header"><div class=col-6><a class=rodelink href=https://pimsnel.nl/blog/>&lt; terug naar blog</a></div><div class=col-6><div class="pimsnel-menu-icons float-right"><a href=https://pimsnel.nl/><i data-feather=home></i></a><a href=javascript:print()><i data-feather=printer></i></a></div></div></div></div><main aria-role=main><div class=container><div class=row><div class="col-md-8 offset-md-2"><h1 class=title>GitLab CI & Blackbox</h1><div class="row pb-3"></div><time class=post-date datetime=2018-01-05T00:00:00Z>5 januari 2018</time>
+<span class=float-right><a class=categories href=categories/technology>technology</a> <span class=categories>|</span> <a class=categories href=categories/gitlab>gitlab</a> <span class=categories>|</span> <a class=categories href=categories/english>english</a></span><h2 class=subtitle>Store secrets encrypted in gitlab and decrypt them at deployment</h2><img class=header-image src=https://pimsnel.nl/blog/2018-01-05-gitlab-ci-blackbox/imgs/quiet.jpg class=img-responsive><div class="row pb-5"></div><div class=homepage-content><p>In this short tutorial I will show how to setup Blackbox for your GitLab project and create a gitlab-ci.yml recipe to decrypt secrets at deployment. You wil never have to worry about storing secret information in GitLab again.</p><p>You should have some experience with GitLab. I am a novice blackbox user myself, I recommend you read the Blackbox documentation first.</p><hr><h2 id=prepare-your-gitlab-project>Prepare your gitlab-project</h2><p>First create a new project in Gitlab and clone it to you machine. I’ve called my project <em>blackbox_with_gitlab_demo</em>.</p><p>Now cd into your empty project and create to following files</p><p>./secret</p><pre><code>secret
+</code></pre><p>./test.rb</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ruby data-lang=ruby>content <span style=color:#f92672>=</span> <span style=color:#66d9ef>File</span><span style=color:#f92672>.</span>read(<span style=color:#e6db74>&#39;secret&#39;</span>)
+<span style=color:#66d9ef>if</span> content<span style=color:#f92672>.</span>strip <span style=color:#f92672>==</span> <span style=color:#e6db74>&#39;secret&#39;</span>
+  print <span style=color:#e6db74>&#34;success</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>
+<span style=color:#66d9ef>else</span>
+  <span style=color:#66d9ef>raise</span> <span style=color:#e6db74>&#34;Failure&#34;</span>
+<span style=color:#66d9ef>end</span>
+</code></pre></div><p>./.gitlab-ci.yml</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=color:#f92672>image</span>: <span style=color:#e6db74>&#34;ruby:2.4&#34;</span><span style=color:#f92672>simple_test</span>:
+  <span style=color:#f92672>script</span>:
+  - <span style=color:#ae81ff>ruby test.rb</span>
+</code></pre></div><p>Now commit and push …</p><pre><code>git add .
+git commit -m &quot;initial import of project with gitlab-ci&quot; -a
+</code></pre><p>If everything works the output in project pipeline should be:</p><pre><code>Running with gitlab-ci-multi-runner 9.5.0 (413da38)
+  on xxx (e347b3ac)
+Using Docker executor with image ruby:2.4 ...
+Using docker image sha256:b967f6d2a7a1fbba2c3b476a9554635e95d45f207f1dd61a5bc7db34cecfbad7 for predefined container...
+Pulling docker image ruby:2.4 ...
+Using docker image ruby:2.4 ID=sha256:713da53688a6446953cb7c0260d03a65a115cb60b727a890142628a4622642c7 for build container...
+Running on runner-e347b3ac-project-532-concurrent-0 via xxxx...
+Cloning repository...
+Cloning into '/builds/Sandbox/blackbox_with_gitlab_demo'...
+Checking out e44b7d1f as master...
+Skipping Git submodules setup
+$ ruby test.rb
+Success
+Job succeeded
+</code></pre><p>In this example I committed the secret unencrypted into the repository. This is just for later showing how blackbox works. You should not do this because Git never forgets. When you accidentally committed a secret without encryption in your repository replace the secret with new one. Just adding encryption afterwards is not a solution.</p><h2 id=setup-blackbox>Setup Blackbox</h2><p>Now we’re going to setup blackbox for this project. If you not already have done this, install blackbox on your development machine. This is a quick and dirty tutorial. Please read the full documentation on the blackbox website.</p><p>We will do the following steps:</p><ul><li>initialize blackbox in our repo</li><li>add yourself as admin user</li><li>Create a new key for the deploy-user</li><li>Add a password-less subkey for the deploy-user.</li><li>add the deploy-user-key to the blackbox admins list</li><li>encrypt the file ./secret</li></ul><p>Run the blackbox_initialize command and commit.</p><pre><code>blackbox_initialize
+
+Enable blackbox for this git repo? (yes/no) yes
+
+git commit -m'INITIALIZE BLACKBOX' keyrings .gitignore
+</code></pre><p>Add myself add blackbox admin</p><pre><code>blackbox_addadmin pim.the.backbox.admin@domain.com
+
+git commit -m &quot;add myself as admin&quot; -a
+</code></pre><p>Notice that email addresses are used as the identifier for a GPG-key. Make sure
+that the are unique when you use more than one key.</p><p>Create a new key for the automated user.</p><pre><code>gpg --gen-key
+
+Real name: gitlab-deploy-user
+Email address: gitlab-deploy-user@domain.com
+</code></pre><p>And create a password less subkey for this key.</p><pre><code>gpg --edit-key gitlab-deploy-user@domain.com
+gpg&gt; addkey
+...   (6) RSA (encrypt only)
+...    0 = key does not expire
+Is this correct? (y/N) y
+Really create? (y/N) y
+
+# key is created now set empty password
+
+gpg&gt; key 2
+
+# the second key gets a * which means it's selected
+ssb* rsa2048/B799C28A639D8F3A
+
+gpg&gt; password
+
+# first enter the main key password
+# then enter the empty password
+# on my Mac I had to do this 3 times!
+
+gpg&gt; save
+</code></pre><p>Ready? Good job, we’re making progress! Now add this deployment key(s) to the blackbox admin list.</p><pre><code>blackbox_addadmin gitlab-deploy-user@domain.com
+
+git commit -m &quot;add gitlab deploy user as admin&quot; -a
+</code></pre><p>Great now let’s encrypt ./secret.</p><pre><code>blackbox_register_new_file secret
+========== PLAINFILE secret
+========== ENCRYPTED secret.gpg
+========== Importing keychain: START
+
+gpg: Total number processed: 7
+gpg:              unchanged: 7
+========== Importing keychain: DONE
+========== Encrypting: secret
+========== Encrypting: DONE
+========== Adding file to list.
+========== CREATED: secret.gpg
+========== UPDATING REPO:
+rm 'secret'
+NOTE: &quot;already tracked!&quot; messages are safe to ignore.
+[master 8f4b498] registered in blackbox: secret
+ 2 files changed, 1 insertion(+)
+ create mode 100644 secret.gpg
+========== UPDATING VCS: DONE
+Local repo updated.  Please push when ready.
+
+git push
+</code></pre><p>./secret is now replaces with ./secret.gpg.</p><p>Commit these changes.</p><pre><code>git commit -m &quot;encrypt secret&quot; -a
+</code></pre><p>So it’s been a while lets push this series of commit’s.</p><pre><code>git push
+</code></pre><p>The GitLab pipeline will fail now because it cannot read secret.</p><pre><code>Running with gitlab-ci-multi-runner 9.5.0 (413da38)
+  on xxx (e347b3ac)
+Using Docker executor with image ruby:2.4 ...
+Using docker image sha256:b967f6d2a7a1fbba2c3b476a9554635e95d45f207f1dd61a5bc7db34cecfbad7 for predefined container...
+Pulling docker image ruby:2.4 ...
+Using docker image ruby:2.4 ID=sha256:713da53688a6446953cb7c0260d03a65a115cb60b727a890142628a4622642c7 for build container...
+Running on runner-e347b3ac-project-532-concurrent-0 via xxx...
+Fetching changes...
+HEAD is now at e44b7d1 initial import of project with gitlab-ci
+From https://xxx/Sandbox/blackbox_with_gitlab_demo
+   e44b7d1..9d38513  master     -&gt; origin/master
+Checking out 9d385138 as master...
+Skipping Git submodules setup
+$ ruby test.rb
+test.rb:1:in `read': No such file or directory @ rb_sysopen - secret (Errno::ENOENT)
+ from test.rb:1:in `&lt;main&gt;'
+ERROR: Job failed: exit code 1
+</code></pre><p>Make Gitlab able to decrypt secret</p><p>In the last steps of this tutorial we will make GitLab able to decrypt all
+blackbox’ed at deployment.</p><p>First we’re going to export the key of the deploy-user.</p><pre><code>gpg -a — export-secret-keys gitlab-deploy-user@domain.com &gt; /tmp/gitlabkey
+</code></pre><p>Now copy the contents of /tmp/gitlabkey and paste in the GitLab project settings as Secret Variable. Name the variable GPG_PRIVATE_KEY</p><p>Afterward rm the exported key:</p><pre><code>rm /tmp/gitlabkey
+</code></pre><p>Now add the following code lines to .gitlab-ci.yml to install blackbox and let
+it import the key at deployment.</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml>- <span style=color:#ae81ff>apt-get update -qq &amp;&amp; apt-get -yqq install gnupg2</span>
+  - <span style=color:#ae81ff>git clone https://github.com/mipmip/blackbox</span>
+  - <span style=color:#ae81ff>cd blackbox</span>
+  - <span style=color:#ae81ff>make manual-install</span>
+  - <span style=color:#ae81ff>cd ..</span>
+  - <span style=color:#ae81ff>gpg2 -v --import &lt;(echo &#34;$GPG_PRIVATE_KEY&#34;)</span>
+  - <span style=color:#ae81ff>GPG=gpg2 blackbox_postdeploy</span>
+</code></pre></div><p>In this tutorial I’m forced to install and use gpg2 because this Ubuntu
+container does not support gpg2 out of the box. This may be unnecessary in your
+situation.</p><p>The command blackbox_postdeploy decrypts all files for deployment</p><p>The complete .gitlab-ci.yml hould look like this:</p><pre><code>image: &quot;ruby:2.4&quot;simple_test:
+  script:
+  - apt-get update -qq &amp;&amp; apt-get -yqq install gnupg2
+  - git clone https://github.com/StackExchange/blackbox.git
+  - cd blackbox
+  - make manual-install
+  - cd ..
+  - gpg2 -v --import &lt;(echo &quot;$GPG_PRIVATE_KEY&quot;)
+  - GPG=gpg2 blackbox_postdeploy
+  - ruby test.rb
+</code></pre><p>Commit and push it.</p><pre><code>git commit -m &quot;enable blackbox for gitlab-ci&quot; .gitlab-ci.yml
+git push
+</code></pre><p>So, if all went well the GitLab pipeline should succeed again and you have successfully implemented blackbox in your continuous integration workflow.</p><p>The pipeline output should look like this:</p><pre><code>Running with gitlab-ci-multi-runner 9.5.0 (413da38)
+  on xxx (e347b3ac)
+Using Docker executor with image ruby:2.4 ...
+Using docker image sha256:b967f6d2a7a1fbba2c3b476a9554635e95d45f207f1dd61a5bc7db34cecfbad7 for predefined container...
+Pulling docker image ruby:2.4 ...
+Using docker image ruby:2.4 ID=sha256:713da53688a6446953cb7c0260d03a65a115cb60b727a890142628a4622642c7 for build container...
+Running on runner-e347b3ac-project-532-concurrent-0 via xxx...
+Fetching changes...
+Removing blackbox/
+HEAD is now at b1b55e1 enable blackbox for gitlab-ci
+From https://xxx/Sandbox/blackbox_with_gitlab_demo
+   b1b55e1..5606980  master     -&gt; origin/master
+Checking out 56069805 as master...
+Skipping Git submodules setup
+$ apt-get update -qq &amp;&amp; apt-get -yqq install gnupg2
+debconf: delaying package configuration, since apt-utils is not installed
+Selecting previously unselected package libassuan0:amd64.
+(Reading database ...
+
+TLTR
+
+$ git clone https://github.com/StackExchange/blackbox.git
+Cloning into 'blackbox'...
+$ cd blackbox
+$ make manual-install
+Symlinking files from ./bin to /usr/local/bin
+Done.
+$ cd ..
+$ gpg2 -v --import &lt;(echo &quot;$GPG_PRIVATE_KEY&quot;)
+gpg: directory `/root/.gnupg' created
+gpg: new configuration file `/root/.gnupg/gpg.conf' created
+gpg: WARNING: options in `/root/.gnupg/gpg.conf' are not yet active during this run
+gpg: keyring `/root/.gnupg/secring.gpg' created
+gpg: keyring `/root/.gnupg/pubring.gpg' created
+Comment: GPGTools - http://gpgtools.org
+gpg: armor header:
+gitlab-deploy-user &lt;gitlab-deploy-user@domain.com&gt;gpg: sec  2048R/C57BF429 2018-01-05
+gpg: key C57BF429: secret key imported
+gpg: pub  2048R/C57BF429 2018-01-05  gitlab-deploy-user &lt;gitlab-deploy-user@domain.com&gt;
+gpg: /root/.gnupg/trustdb.gpg: trustdb created
+gpg: using PGP trust model
+gpg: key C57BF429: public key &quot;gitlab-deploy-user &lt;gitlab-deploy-user@domain.com&gt;&quot; imported
+gpg: Total number processed: 1
+gpg:               imported: 1  (RSA: 1)
+gpg:       secret keys read: 1
+gpg:   secret keys imported: 1
+$ GPG=gpg2 blackbox_postdeploy
+========== Importing keychain: START
+gpg: keyblock resource `/builds/Sandbox/blackbox_with_gitlab_demo/keyrings/live/pubring.kbx': Not supported
+gpg: Note: This version of GPG does not support the Keybox format
+gpg: key C57BF429: &quot;gitlab-deploy-user &lt;gitlab-deploy-user@domain.com&gt;&quot; not changed
+gpg: Total number processed: 1
+gpg:              unchanged: 1
+========== Importing keychain: DONE
+========== Decrypting new/changed files: START
+========== EXTRACTED secret
+========== Decrypting new/changed files: DONE
+$ ruby test.rb
+Success
+Job succeeded
+</code></pre><p>I hope this gives you inspiration and let’s you never worry about commiting
+secret stuff into GitLab again.</p></div><p><a href="https://pimsnel.nl/pagina/reageer?artikel=GitLab%20CI%20%26%20Blackbox">Stuur me een reactie over dit artikel</a></p></div></div></div></main><div class=footer><img class=pim-linksonder src=https://pimsnel.nl/images/logo-pimsnel-com.png alt="logo Pim Snel"><div class=container-fluid><div class=col-sm-4>© 2019</div><div class=col-sm-4></div><div class=col-sm-4></div></div><img class=pim-rechtsonder src=https://pimsnel.nl/images/pim-rechtsonder.png alt="logo Pim Snel"></div><script src=https://pimsnel.nl/main.dc43b.js></script><script async defer data-website-id=79cceef1-036f-42df-b2e1-39a1e273ebf1 src=https://umami.quiqr.app/umami.js></script></body></html>

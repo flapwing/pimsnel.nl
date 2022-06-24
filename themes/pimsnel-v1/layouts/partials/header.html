@@ -1,0 +1,45 @@
+<div class="container-fluid">
+  <div class="row pimsnel-header">
+
+    <div class="col-md-4">
+    </div>
+
+
+    <div class="col-md-4">
+<!--      <a href="/"><img class="pimsnel-logo mx-auto d-block"
+  src="/images/logo-pimsnel-com.png" alt="logo Pim Snel" /></a>-->
+    </div>
+
+    <div class="col-md-4">
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row pimsnel-header">
+
+    <div class="col-6 ">
+      {{ if and (eq .Section "blog") (eq .Kind "page") }}
+      <a class="rodelink" href="/blog/">&lt; terug naar blog</a>
+      {{ end }}
+    </div>
+
+    <div class="col-6">
+      <div class="pimsnel-menu-icons float-right">
+
+        {{ if not (eq .Kind "home") }}
+        <a href="/"><i data-feather="home"></i></a>
+        <a href="javascript:print()"><i data-feather="printer"></i></a>
+        {{ end }}
+
+        {{ if (eq .Kind "page")}}
+        {{ end }}
+        <!--
+          <i data-feather="star"></i>
+          <i data-feather="rss"></i>
+        -->
+      </div>
+    </div>
+  </div>
+
+</div>

@@ -1,0 +1,13 @@
+---
+title: All Files
+file: static/all/.pogo-images.md
+fields:
+  - key: image
+    type: bundle-manager
+    path: ""
+    fields:
+      - key: thumb
+        title: Thumb
+        type: bundle-image-thumbnail
+
+

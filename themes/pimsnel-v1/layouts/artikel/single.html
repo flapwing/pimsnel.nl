@@ -1,0 +1,41 @@
+{{ define "main" }}
+
+{{ $pagePath := .Permalink }}
+
+<div class="container">
+  <div class="row">
+
+    <div class="col-md-8 offset-md-2">
+        <h1 class="title">{{.Title}}</h1>
+        <div class="row pb-3" ></div>
+        <time class="post-date" datetime="{{ .Date.Format "2006-01-02T15:04:05Z07:00" | safeHTML }}">
+          {{ .Date.Day }} {{ index $.Site.Data.maanden (printf "%d" .Date.Month) }} {{ .Date.Year }}
+        </time>
+
+        <span class="float-right">{{ range $i, $e := .Params.categories }}{{ if $i }} <span class="categories">|</span> {{ end }}<a class="categories" href="categories/{{ $e | urlize }}">{{$e}}</a>{{ end }}
+        </span>
+        {{ with .Params.subtitle }}
+          <h2 class="subtitle">{{.}}</h2>
+        {{ end }}
+
+        {{ with .Params.image }}
+        <img class="header-image" src="{{$pagePath}}{{ . }}" class="img-responsive" />
+        {{ end }}
+
+        <div class="row pb-5" ></div>
+
+        <div class="homepage-content">
+          {{- .Content -}}
+        </div>
+
+        <p><a href="/pagina/reageer?artikel={{.Title}}">Stuur me een reactie over dit artikel</a></p>
+    </div>
+  </div>
+</div>
+
+
+
+
+{{ end }}
+
+

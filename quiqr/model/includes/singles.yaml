@@ -1,0 +1,10 @@
+- key: image-manager
+  _mergePartial: global-images
+
+- key: video-manager
+  _mergePartial: global-videos
+
+- key: allfiles-manager
+  _mergePartial: global-allfiles
+
+

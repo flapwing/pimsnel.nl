@@ -1,0 +1,73 @@
+hugover = "0.88.1"
+
+[[serve]]
+key = "default"
+config = "config.toml"
+
+[[build]]
+key = "default"
+config = "config.toml"
+
+[[menu]]
+key = "content"
+title = "Content"
+
+  [[menu.menuItems]]
+  key = "frontpage"
+
+  [[menu.menuItems]]
+  key = "pages"
+
+[[menu]]
+key = "settings"
+title = "Settings"
+
+  [[menu.menuItems]]
+  key = "mainConfig"
+
+[[singles]]
+key = "frontpage"
+title = "Front Page"
+file = "content/_index.md"
+_mergeFromPartial = "page"
+
+[[singles]]
+key = "mainConfig"
+title = "Site Configuration"
+file = "config.toml"
+
+  [[singles.fields]]
+  key = "title"
+  title = "Site Title"
+  type = "string"
+  tip = "Your page title."
+
+  [[singles.fields]]
+  key = "baseurl"
+  title = "Base URL"
+  type = "string"
+  tip = "Your site URL."
+
+  [[singles.fields]]
+  key = "theme"
+  title = "Theme"
+  type = "readonly"
+  tip = "The current theme."
+
+  [[singles.fields]]
+  key = "languageCode"
+  title = "Language Code"
+  type = "readonly"
+
+  [[singles.fields]]
+  key = "googleAnalytics"
+  title = "Google Analytics"
+  type = "string"
+  tip = "Provide a Google Analitics Tracking Code to enable analytics."
+
+  [[singles.fields]]
+  key = "enableRobotsTXT"
+  title = "Enable Robots"
+  type = "boolean"
+  default = true
+  tip = "If you want you page to be indexed, keep this enabled."

@@ -1,0 +1,8 @@
+---
+subject: "Contactformulier pimsnel.com"
+from: you-have-mail@pogoform.com
+to: post@pimsnel.com
+senders_email_field: email
+reply_to_sender: true
+redirect_to: /pagina/bericht-verzonden
+antispam: slide

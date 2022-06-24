@@ -1,0 +1,33 @@
+- key: paginas
+  title: Pagina's
+  menuItems:
+    - key: frontpage
+    - key: contact
+    - key: pages
+
+- key: blog
+  title: Blog
+  menuItems:
+    - key: posts
+
+- key: ervaring
+  title: Ervaring
+  menuItems:
+    - key: kunde
+    - key: onderwijs
+    - key: opensource
+    - key: projecten
+    - key: software
+    - key: werk
+
+- key: assets
+  title: "Assets"
+  menuItems:
+    - key: image-manager
+
+
+- key: Settings
+  title: "Instellingen "
+  menuItems:
+    - key: mainConfig
+

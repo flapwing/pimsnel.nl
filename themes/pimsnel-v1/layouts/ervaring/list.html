@@ -1,0 +1,152 @@
+{{ define "main" }}
+
+<div class="container">
+  <div class="row">
+
+    <div class="col-md-9 offset-md-2">
+        <h1>{{.Title}}</h1>
+        {{ with .Params.subtitle }}
+        <span class="subtitle">{{.}}</span>
+        {{ end }}
+
+        <div class="homepage-content">
+          {{.Content}}
+        </div>
+
+    </div>
+  </div>
+
+  <div class="row">
+
+    <div class="col-md-7">
+
+      <div class="row">
+        <div class="col-md-9 offset-md-3">
+          <h2>Werk</h2>
+        </div>
+      </div>
+      {{ range where .Site.Pages.ByWeight ".Params.type" "werk"}}
+      <div class="row">
+        <div class="col-md-3 text-right">
+          <span class="d-none d-md-block">{{ .Params.periode }}</span>
+        </div>
+        <div class="col-md-9">
+          <h3>{{ .Title }} <span class="regular-text d-md-none d-lg-none">{{ .Params.periode }}</span></h3>
+          {{ .Content }}
+        </div>
+      </div>
+      {{ end }}
+
+      <div class="row pb-5" ></div>
+
+      <div class="row">
+        <div class="col-md-9 offset-md-3">
+          <h2>Onderwijs</h2>
+        </div>
+      </div>
+      {{ range where .Site.Pages.ByWeight ".Params.type" "onderwijs"}}
+      <div class="row">
+        <div class="col-md-3 text-right">
+          <span class="d-none d-md-block">{{ .Params.periode }}</span>
+        </div>
+        <div class="col-md-9">
+          <h5>{{ .Title }}</h5>
+          <p class="regular-text d-md-none d-lg-none pb-3">{{ .Params.periode }}</p>
+        </div>
+      </div>
+      {{ end }}
+
+
+
+      <div class="row pb-5" ></div>
+
+      <div class="row">
+        <div class="col-md-9 offset-md-3">
+          <h2>Open Source</h2>
+        </div>
+      </div>
+      {{ range where .Site.Pages.ByWeight ".Params.type" "opensource"}}
+      <div class="row">
+        <div class="col-md-3 text-right">
+          <p data="{{ .Params.github }}" id="stargaze1-{{ printf .Title | md5 }}" class="d-none d-md-block ascii-loader-icon stargazers">&nbsp;</p>
+        </div>
+        <div class="col-md-9">
+          <h3>{{ .Title }} <span data="{{ .Params.github }}" id="stargaze2-{{ printf .Title | md5 }}" class="regular-text d-md-none d-lg-none ascii-loader-icon stargazers">&nbsp;</span></h3>
+          {{ .Content }}
+        </div>
+      </div>
+      <div class="row pb-2" ></div>
+      {{ end }}
+
+      <div class="row pb-5" ></div>
+
+
+      <div class="row">
+        <div class="col-md-9 offset-md-3">
+          <h2>Software</h2>
+        </div>
+      </div>
+      {{ range where .Site.Pages.ByWeight ".Params.type" "software"}}
+      <div class="row">
+        <div class="col-md-3 text-right">
+          <span class="d-none d-md-block">{{ .Params.price }}</span>
+
+          {{ with .Params.logo }}
+          <div class="logo d-none d-md-block">
+          <img src="{{ . }}" />
+          </div>
+          {{ end }}
+
+        </div>
+        <div class="col-md-9">
+          <h3>{{ .Title }} <span class="regular-text d-md-none d-lg-none">{{ .Params.price }}</span></h3>
+          {{ with .Params.logo }}
+          <img class="float-left d-md-none d-lg-none" style="margin: 0 10px 0px 0" src="{{ . }}" />
+          {{ end }}
+          {{ .Content }}
+
+        </div>
+      </div>
+      {{ end }}
+
+      <div class="row pb-5" ></div>
+
+      <div class="row">
+        <div class="col-md-9 offset-md-3">
+          <h2>Bijzondere projecten</h2>
+        </div>
+      </div>
+      {{ range where .Site.Pages.ByWeight ".Params.type" "projecten"}}
+      <div class="row">
+        <div class="col-md-3 text-right">
+          <span class="d-none d-md-block">{{ .Params.periode }}</span>
+        </div>
+        <div class="col-md-9">
+          <h3>{{ .Title }} <span class="regular-text d-md-none d-lg-none">{{ .Params.periode }}</span></h3>
+          {{ .Content }}
+        </div>
+      </div>
+      {{ end }}
+      <div class="row pb-5" ></div>
+
+
+    </div>
+
+    <div class="col-md-3 offset-md-1">
+
+      {{ range where .Site.Pages.ByWeight ".Params.type" "kunde"}}
+      <h3>{{ .Title }}</h3>
+      {{ .Content }}
+      <div class="row pb-3" ></div>
+      {{ end }}
+
+    </div>
+
+  </div>
+</div>
+
+
+
+
+{{ end }}
+

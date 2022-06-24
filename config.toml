@@ -1,0 +1,18 @@
+baseurl = "https://pimsnel.nl"
+languageCode = "nl-nl"
+languageLang = "nl"
+title = "Pim Snel"
+theme = ["hugo-debugprint", "pimsnel-v1"]
+googleAnalytics = "UA-20301329-1"
+disqusShortname = ""
+summaryLength = 30
+canonifyurls = "true"
+[markup]
+
+  [markup.goldmark]
+
+    [markup.goldmark.renderer]
+    unsafe = true
+[params]
+  debug = false
+

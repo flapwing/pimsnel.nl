@@ -1,0 +1,114 @@
+{{ define "main" }}
+
+{{ $pagePath := .Permalink }}
+
+<div class="container">
+
+  <div class="row">
+    <div class="col-md-8 offset-md-4">
+        <h1>{{.Title}}</h1>
+
+        {{ with .Params.subtitle }}
+        <span class="subtitle">{{.}}</span>
+        {{ end }}
+
+        <div class="row">
+          <div class="col-md-6">
+            {{ .PublishDate.Format "2 January, 2006" }}
+          </div>
+          <div class="col-md-6 text-right">
+              {{ range .Params.categories }}
+              &nbsp;<a href="categories/{{ . | urlize }}">{{ . }}</a>
+              {{ end }}
+            </ul>
+          </div>
+        </div>
+
+        {{ with .Params.image }}
+        <img class="header-image" src="{{$pagePath}}{{ . }}" class="img-responsive" />
+        {{ end }}
+
+    </div>
+  </div>
+
+  <div class="row">
+
+    <div class="col-md-3">
+        {{ with .Params.recept.tijd }}
+        <h2>Bereiding</h2>
+
+        {{ with .werktijd }}
+        <p class="tijd"><strong>werktijd:</strong> {{ . }}</p>
+        {{ end }}
+
+        {{ with .bereidingstijd }}
+        <p class="tijd"><strong>bereidingstijd:</strong> {{ . }}</p>
+        {{ end }}
+        <div class="row pb-5" ></div>
+        {{ end }}
+
+        {{ if .Params.recept.ingrediënten }}
+        {{ with .Params.recept.calculator }}
+        <h2>Ingrediënten</h2>
+        <input type="hidden" id="plusfactor" value="{{ .plusfactor }}" />
+        <input type="hidden" id="start" value="{{ .start }}" />
+        <input type="hidden" id="end" value="{{ .end }}" />
+        <input type="hidden" id="enkelvoud" value="{{ .enkelvoud }}" />
+        <input type="hidden" id="meervoud" value="{{ .meervoud }}" />
+        <div class="recipe-calculator">voor <br/><span class="eindproduct-hoeveelheid">{{ .start }}</span> <span class="eindproduct-naam">{{ .enkelvoud }}</span><button class="meer">+</button><button class="minder">-</button></div>
+        <div class="row pb-3" ></div>
+        {{ end }}
+
+        {{ with .Params.recept.ingrediënten }}
+        <ul id="ingredients" class="receptlijst">
+
+          {{ range . }}
+          {{ if not .verberg }}
+          <li><span class="basishoeveelheid"
+                    {{if .afwijkende_plusfactor }}
+                    afwijkende_plusfactor="{{.afwijkende_plusfactor}}"
+                    {{end}}
+
+
+              data="{{.basishoeveelheid}}">{{ .basishoeveelheid }}</span> <span class="eenheid">{{.eenheid}}</span> {{.product}} <span class="prijs"></span></li>
+          {{ end }}
+          {{ end }}
+
+        </ul>
+        <div class="row pb-5" ></div>
+        {{ end }}
+        {{ end }}
+
+
+        {{ with .Params.recept.benodigdheden }}
+        <h2>Benodigdheden</h2>
+        <ul class="receptlijst">
+
+          {{ range . }}
+          <li>{{ . }}</li>
+          {{ end }}
+
+        </ul>
+        <div class="row pb-5" ></div>
+        {{ end }}
+
+    </div>
+
+    <div class="col-md-8 offset-md-1">
+
+        <div class="homepage-content">
+          {{- .Content -}}
+        </div>
+
+        <p><a href="/pagina/reageer?artikel={{.Title}}">Stuur me een reactie over dit recept</a></p>
+
+    </div>
+  </div>
+</div>
+
+
+
+
+{{ end }}
+
+

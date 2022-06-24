@@ -1,0 +1,393 @@
+hugover: 0.88.1
+serve:
+  - key: default
+    config: config.toml
+build:
+  - key: default
+    config: config.toml
+
+collections:
+
+  - key: kunde
+    title: Technologie
+    folder: content/ervaring/kunde/
+    extension: md
+    dataformat: yaml
+    itemtitle: Post
+    fields:
+      - key: draft
+        title: Concept
+        type: boolean
+      - key: title
+        title: Title
+        type: string
+      - key: weight
+        title: Gewicht (lager is hoger in de lijst)
+        type: number
+      - key: type
+        title: Type
+        type: string
+      - key: mainContent
+        title: Content
+        type: markdown
+  - key: onderwijs
+    title: Onderwijs
+    folder: content/ervaring/onderwijs
+    extension: md
+    dataformat: yaml
+    itemtitle: Item
+    fields:
+      - key: draft
+        title: Concept
+        type: boolean
+      - key: title
+        title: Title
+        type: string
+      - key: weight
+        title: Gewicht (lager is hoger in de lijst)
+        type: number
+      - key: type
+        title: Type
+        type: string
+      - key: periode
+        title: Periode
+        type: string
+      - key: link
+        title: URL
+        type: string
+      - key: mainContent
+        title: Content
+        type: markdown
+
+  - key: opensource
+    title: Opensource
+    folder: content/ervaring/opensource
+    extension: md
+    dataformat: yaml
+    itemtitle: Item
+    fields:
+      - key: draft
+        title: Concept
+        type: boolean
+      - key: title
+        title: Title
+        type: string
+      - key: weight
+        title: Gewicht (lager is hoger in de lijst)
+        type: number
+      - key: type
+        title: Type
+        type: string
+      - key: github
+        title: github
+        type: string
+      - key: mainContent
+        title: Content
+        type: markdown
+  - key: projecten
+    title: Projecten
+    folder: content/ervaring/projecten
+    extension: md
+    dataformat: yaml
+    itemtitle: Item
+    fields:
+      - key: draft
+        title: Concept
+        type: boolean
+      - key: title
+        title: Title
+        type: string
+      - key: weight
+        title: Gewicht (lager is hoger in de lijst)
+        type: number
+      - key: type
+        title: Type
+        type: string
+      - key: periode
+        title: Periode
+        type: string
+      - key: link
+        title: URL
+        type: string
+      - key: mainContent
+        title: Content
+        type: markdown
+
+  - key: software
+    title: Software
+    folder: content/ervaring/software
+    extension: md
+    dataformat: yaml
+    itemtitle: Item
+    fields:
+      - key: draft
+        title: Concept
+        type: boolean
+      - key: title
+        title: Title
+        type: string
+      - key: weight
+        title: Gewicht (lager is hoger in de lijst)
+        type: number
+      - key: type
+        title: Type
+        type: string
+      - key: price
+        title: price
+        type: string
+      - key: logo
+        title: logo
+        type: string
+      - key: link
+        title: URL
+        type: string
+      - key: mainContent
+        title: Content
+        type: markdown
+  - key: werk
+    title: Werk
+    folder: content/ervaring/werk
+    extension: md
+    dataformat: yaml
+    itemtitle: Item
+    fields:
+      - key: draft
+        title: Concept
+        type: boolean
+      - key: title
+        title: Title
+        type: string
+      - key: weight
+        title: Gewicht (lager is hoger in de lijst)
+        type: number
+      - key: type
+        title: Type
+        type: string
+      - key: periode
+        title: Periode
+        type: string
+      - key: link
+        title: URL
+        type: string
+      - key: mainContent
+        title: Content
+        type: markdown
+
+  - key: pages
+    title: Pagina's
+    folder: content/pagina/
+    extension: md
+    dataformat: yaml
+    itemtitle: Pagina
+    fields:
+      - key: draft
+        title: Draft
+        type: boolean
+      - key: title
+        title: Title
+        type: string
+      - key: mainContent
+        title: Content
+        type: easymde
+      - key: bundle-manager
+        type: bundle-manager
+        path: imgs
+        extensions:
+          - png
+          - jpg
+          - gif
+        fields:
+          - key: title
+            title: Title
+            type: string
+          - key: description
+            title: Description
+            type: string
+            multiLine: true
+
+  - key: posts
+    title: Posts
+    folder: content/blog/
+    extension: md
+    dataformat: yaml
+    itemtitle: Post
+    fields:
+      - key: draft
+        title: Draft
+        type: boolean
+      - key: title
+        title: Title
+        type: string
+      - key: subtitle
+        title: Subtitle
+        type: string
+      - key: pubdate
+        title: Pub Date
+        type: date
+        default: now
+      - key: type
+        title: Type
+        type: select
+        multiple: false
+        options:
+          - text: artikel
+            value: artikel
+          - text: recept
+            value: recept
+      - key: image
+        title: Featured Image
+        type: string
+      - key: categories
+        title: Catogories
+        type: chips
+      - key: images
+        type: bundle-manager
+        path: "imgs"
+        extensions:
+          - svg
+          - png
+          - jpg
+          - gif
+        fields:
+          - key: thumb
+            title: Thumb
+            type: bundle-image-thumbnail
+      - key: mainContent
+        title: Content
+        type: easymde
+      - key: recept
+        type: pull
+        group: recept
+        fields:
+          - key: tijd
+            group: tijd
+            type: pull
+            fields:
+              - key: bereidingstijd
+                type: string
+                title: bereidingstijd
+              - key: werktijd
+                type: string
+                title: werktijd
+
+          - key: ingrediënten
+            type: accordion
+            title: ingrediënten
+            fields:
+              - key: product
+                type: string
+                title: product
+                arrayTitle: true
+              - key: eenheid
+                type: string
+                title: eenheid
+              - key: basishoeveelheid
+                type: string
+                title: basishoeveelheid
+              - key: kostprijs
+                type: number
+                title: kostprijs
+              - key: verberg
+                title: verberg
+                type: boolean
+              - key: andere_plusfactor
+                title: afwijkende plusfactor
+                type: number
+          - key: calculator
+            group: calculator
+            type: pull
+            fields:
+              - key: plusfactor
+                type: number
+                title: plusfactor
+              - key: start
+                type: number
+                title: start
+              - key: end
+                type: number
+                title: end
+              - key: meervoud
+                type: string
+                title: meervoud
+              - key: enkelvoud
+                type: string
+                title: enkelvoud
+
+
+singles:
+
+  - key: frontpage
+    title: Frontpage
+    dataformat: yaml
+    file: content/_index.md
+    fields:
+      - key: title
+        title: Titel
+        type: string
+        multiLine: true
+      - key: description
+        title: Meta Description
+        type: string
+        multiLine: true
+      - key: images
+        type: bundle-manager
+        path: "imgs"
+        extensions:
+          - svg
+          - png
+          - jpg
+          - gif
+        fields:
+          - key: thumb
+            title: Thumb
+            type: bundle-image-thumbnail
+
+      - key: mainContent
+        title: Tekst
+        type: markdown
+
+  - key: contact
+    title: Contact
+    dataformat: yaml
+    file: content/contact.md
+    fields:
+      - key: title
+        title: Titel
+        type: string
+        multiLine: true
+      - key: description
+        title: Meta Description
+        type: string
+        multiLine: true
+      - key: mainContent
+        title: Tekst
+        type: markdown
+
+  - key: mainConfig
+    title: Main Config
+    file: config.toml
+    fields:
+      - key: title
+        title: Site Title
+        type: string
+        tip: Your page title.
+      - key: baseurl
+        title: Base URL
+        type: string
+        tip: Your site URL.
+      - key: theme
+        title: Theme
+        type: readonly
+        tip: The current theme.
+      - key: languageCode
+        title: Language Code
+        type: readonly
+      - key: googleAnalytics
+        title: Google Analytics
+        type: string
+        tip: Provide a Google Analitics Tracking Code to enable analytics.
+      - key: enableRobotsTXT
+        title: Enable Robots
+        type: boolean
+        default: true
+        tip: If you want you page to be indexed, keep this enabled.

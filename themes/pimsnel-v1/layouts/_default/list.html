@@ -1,0 +1,61 @@
+{{ define "main" }}
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-9 offset-md-3">
+      <h2>Posts</h2>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-9">
+
+      {{ range .Pages}}
+
+      <div class="row">
+        <div class="col-md-3">
+          {{ .PublishDate.Format "2 January, 2006" }}<br/>
+          {{ with .Params.categories }}
+          in
+          {{ range . }}
+          &nbsp;<a href="categories/{{ . | urlize }}">{{ . }}</a>
+          {{ end }}
+
+          {{ end }}
+        </div>
+
+        <div class="col-md-8">
+          <a href="{{.Permalink}}"><h3>{{.Title}}</h3></a>
+          <p>{{.Summary}}<br/>
+          <a href="{{.Permalink}}">lees verder</a>
+          </p>
+        </div>
+
+      </div>
+      <div class="row pb-3" ></div>
+
+      {{ end }}
+    </div>
+
+    <div class="col-md-3">
+
+      <h3>Categorieën</h3>
+      <ul>
+        {{ range .Site.Taxonomies.categories }}
+        <li><a href="{{ .Page.RelPermalink }}">{{ .Page.Title }}</a></li>
+        {{ end }}
+      </ul>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+
+
+{{ end }}
+
+
+

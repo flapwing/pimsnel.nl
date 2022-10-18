@@ -1,7 +1,6 @@
 ---
-description: 'Pim Snel, IT adviseur en ondernemer.'
+description: Pim Snel, IT adviseur en ondernemer.
 page_class: simple-stretched
-resources: []
 title: Hallo
 
 ---
@@ -10,8 +9,6 @@ title: Hallo
 
 ## Ik ben Pim Snel <img src="imgs/getfoto2.jpg" alt="Pim Snel" style="width:35px;border-radius:50%;margin-left:10px;"/>
 <br/>
-
-Je kunt me [inhuren voor IT advies](/pagina/inhuren). Ik zet graag mijn [ervaring](/ervaring/) in om bedrijven met IT vraagstukken te helpen.
 
 Af en toe schrijf ik een [stukje](/blog/) over technologie, eten of iets waar ik mee bezig ben of wat me boeit.
 

@@ -254,7 +254,7 @@ collections:
             type: bundle-image-thumbnail
       - key: mainContent
         title: Content
-        type: easymde
+        type: markdown
       - key: recept
         type: pull
         group: recept

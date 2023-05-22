@@ -4,7 +4,7 @@ draft: false
 subtitle: Eenvoudige serverless redirects met Terraform in AWS.
 pubdate: '2023-05-18'
 type: artikel
-image: imgs/trajno.png
+image: imgs/seed_565023_00002.png
 categories:
   - aws
   - terraform

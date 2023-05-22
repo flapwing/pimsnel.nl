@@ -1,8 +1,7 @@
 ---
 draft: false
 link: ''
-periode: 2021-heden
-resources: []
+periode: 2021-2022
 title: Freelance IT Adviseur
 type: werk
 weight: -1

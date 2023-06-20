@@ -2,7 +2,7 @@
 title: Prometheus Alert Rules schrijven met Nickel
 draft: false
 subtitle: Eenvoudige tutorial om de nieuwe taal Nickel te leren kennen
-pubdate: '2023-05-18'
+pubdate: '2023-06-20'
 type: artikel
 image: imgs/nickel-golden-tinge.jpg
 categories:

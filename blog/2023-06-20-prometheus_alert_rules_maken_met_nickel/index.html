@@ -1,0 +1,218 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><base href=https://pimsnel.nl/><title>Pim Snel</title><link href=https://pimsnel.nl/main.dc43b.css rel=stylesheet><link href=https://pimsnel.nl/style.css rel=stylesheet><link rel=apple-touch-icon sizes=180x180 href=https://pimsnel.nl/apple-touch-icon.png><link rel=icon type=image/png sizes=32x32 href=https://pimsnel.nl/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=https://pimsnel.nl/favicon-16x16.png><link rel=manifest href=https://pimsnel.nl/site.webmanifest><link rel=mask-icon href=https://pimsnel.nl/safari-pinned-tab.svg color=#5bbad5><meta name=msapplication-TileColor content="#da532c"><meta name=theme-color content="#ffffff"><link href=https://pimsnel.nl/fonts.css rel=stylesheet><style>.debugprint_wrap{padding:20px;display:inline-block;margin:10px auto;border-radius:5px;border:2px solid #ddd}.debugprint td,.debugprint th{padding-left:4px;padding-right:4px}.debugprint th{border-bottom:1px solid #ddd;padding-bottom:10px;margin-bottom:10px}.debugprint tr{padding:5px 10px}.debugprint .key{font-weight:700}.debugprint .type{font-size:.9em;font-family:monospace;font-style:italic}.debugprint .value{font-family:monospace}.debugprint .true{color:green}.debugprint .false{color:red}.debugprint th.key,.debugprint th.type,.debugprint th.value{font-family:helvetica,arial,san-serif;text-transform:uppercase;letter-spacing:1px;font-size:1em;font-style:normal}</style></head><body class="pimsnel-type-artikel pimsnel-kind-page"><div class=container-fluid><div class="row pimsnel-header"><div class=col-md-4></div><div class=col-md-4></div><div class=col-md-4></div></div></div><div class=container><div class="row pimsnel-header"><div class=col-6><a class=rodelink href=https://pimsnel.nl/blog/>&lt; terug naar blog</a></div><div class=col-6><div class="pimsnel-menu-icons float-right"><a href=https://pimsnel.nl/><i data-feather=home></i></a><a href=javascript:print()><i data-feather=printer></i></a></div></div></div></div><main aria-role=main><div class=container><div class=row><div class="col-md-8 offset-md-2"><h1 class=title>Prometheus Alert Rules schrijven met Nickel</h1><div class="row pb-3"></div><time class=post-date datetime=2023-05-18T00:00:00Z>18 mei 2023</time>
+<span class=float-right><a class=categories href=categories/nickel>nickel</a> <span class=categories>|</span> <a class=categories href=categories/tutorial>tutorial</a></span><h2 class=subtitle>Eenvoudige tutorial om de nieuwe taal Nickel te leren kennen</h2><img class=header-image src=https://pimsnel.nl/blog/2023-06-20-prometheus_alert_rules_maken_met_nickel/imgs/nickel-golden-tinge.jpg class=img-responsive><div class="row pb-5"></div><div class=homepage-content><p>In deze blog geef ik een korte demonstratie hoe je Prometheus Rules geschreven
+in YAML omzet naar efficiënte Nickel-code die YAML kan genereren.</p><p>Een van onze klanten heeft ons de opdracht gegeven hun <a href=https://grafana.com/products/cloud/>Grafana
+Cloud</a> in te richten met tientallen
+dashboards and Prometheus alert rules. Vergelijkbaar met het <em>Infrastructure as
+Code</em> principe hanteren we hier de <em>Dashboards as Code</em> aanpak en voor de
+Prometheus alerts, tja <em>Alerts as Code</em>.</p><p>De dashboards worden voor Grafana gedefinieerd in JSON, maar we schrijven de
+dashboard definities in <a href=https://jsonnet.org>jsonnet</a> en de
+<a href=https://grafana.github.io/grafonnet-lib>grafonnet-library</a>. Dit voorkomt dat
+we lange lappen code met veel redundantie moeten schrijven. Dit is de manier
+die Grafana aanbeveelt.</p><p>De <a href=https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/>Prometheus Alerts
+Rules</a>
+worden aangeboden als YAML bestanden en ook hierin zit ontzettend veel
+herhaling. Behalve dat dit veel schrijfwerk is, is het ook foutgevoelig om
+zoveel code te schrijven en belangrijk is ook de <em>configuratie drift</em> die snel
+optreedt als je redundante configuratie code schrijft. Door code te genereren
+werk je toe naar een <a href=https://en.wikipedia.org/wiki/Single_source_of_truth>single source of
+truth</a>.</p><blockquote><p>&ldquo;Configuration drift occurs when a standardized group of IT resources, be
+they virtual servers, standard router configurations in VNF deployments, or
+any other deployment group that is built from a standard template, diverge in
+configuration over time. … The Infrastructure as Code methodology from DevOps
+is designed to combat Configuration Drift and other infrastructure management
+problems.&rdquo;</p></blockquote><ul><li><em>Kemp Technologies on Configuration Drift</em></li></ul><p>Er zijn diverse manieren om YAML code te genereren, maar als <a href=https://nixos.org>Nix en
+NixOS</a> enthousiasteling besloot ik te gaan experimenteren
+met de programmeertaal <a href=https://nickel-lang.org>Nickel</a>. Deze taal is
+voortgekomen uit de Nix-community en de 1.0 versie van Nickel is in mei 2023
+officieel aangekondigd door <a href=https://www.tweag.io/opensource/>Tweag</a>, het
+bedrijf dat de Nickel ontwikkelt.</p><p>Aan de slag!</p><h2 id=de-oude-werkwijze>De oude werkwijze</h2><p>Hieronder staat een voorbeeld met 2 Prometheus alert rules zoals ze de oude
+situatie zijn geschreven. We gaan in een paar stappen werken naar een versie in
+Nickel die vergelijkbare, en zelf betere YAML genereert.</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=color:#f92672>groups</span>:
+  - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>mycompany</span>
+    <span style=color:#f92672>rules</span>:
+      - <span style=color:#f92672>alert</span>: <span style=color:#ae81ff>aws_documentdb_freeable_memory_low</span>
+        <span style=color:#f92672>expr</span>: |-<span style=color:#e6db74>
+</span><span style=color:#e6db74>            16 / (aws_docdb_freeable_memory_average{dbinstance_identifier=&#34;tf-created-AABBCCDD&#34;}
+</span><span style=color:#e6db74>            / (1024^3)) * 100 &lt; 25</span>            
+        <span style=color:#f92672>for</span>: <span style=color:#ae81ff>10m</span>
+        <span style=color:#f92672>labels</span>:
+          <span style=color:#f92672>team</span>: <span style=color:#ae81ff>devops</span>
+          <span style=color:#f92672>platform</span>: <span style=color:#ae81ff>aws</span>
+        <span style=color:#f92672>annotations</span>:
+          <span style=color:#f92672>description: &#39;DocumentDB</span>: <span style=color:#ae81ff>the instance has less then 25% freeable freeable memory.&#39;</span>
+          <span style=color:#f92672>summary</span>: <span style=color:#ae81ff>DocumentDB is has low freeable memory</span>
+          <span style=color:#f92672>jira_ticket</span>: <span style=color:#ae81ff>aws-devops</span>
+          <span style=color:#f92672>severity</span>: <span style=color:#ae81ff>2</span>
+
+      - <span style=color:#f92672>alert</span>: <span style=color:#ae81ff>aws_documentdb_cpu_usage_too_high</span>
+        <span style=color:#f92672>expr</span>: <span style=color:#ae81ff>aws_docdb_cpuutilization_average &gt; 90</span>
+        <span style=color:#f92672>for</span>: <span style=color:#ae81ff>10m</span>
+        <span style=color:#f92672>labels</span>:
+          <span style=color:#f92672>team</span>: <span style=color:#ae81ff>devops</span>
+          <span style=color:#f92672>platform</span>: <span style=color:#ae81ff>aws</span>
+        <span style=color:#f92672>annotations</span>:
+          <span style=color:#f92672>summary</span>: <span style=color:#e6db74>&#34;DocumentDB is reaching its cpu limit&#34;</span>
+          <span style=color:#f92672>description</span>: <span style=color:#e6db74>&#34;DocumentDB: the instance are using more than 90% of the cpu assigned&#34;</span>
+          <span style=color:#f92672>jira_ticket</span>: <span style=color:#ae81ff>aws-devops</span>
+          <span style=color:#f92672>severity</span>: <span style=color:#ae81ff>2</span>
+</code></pre></div><p>Je ziet op het eerste gezicht al veel dubbele informatie. Sowieso alle
+sleutelnamen, maar ook de meta informatie, de Jira tickets, de labels, etc&mldr;
+Hierboven zie je twee alerts, maar in de echte situatie gaat het om tientallen,
+zo niet honderden alerts definities. Hier valt echt wat te winnen.</p><p>We gaan nu in een paar stappen deze Prometheus YAML omschrijven slimmere Nickel
+broncode.</p><h2 id=stap-1-yaml-naar-platte-nickel>Stap 1: YAML naar platte Nickel</h2><p>Laten we beginnen om de YAML domweg om te zetten naar Nickel zodat we deze
+daarna weer kunnen exporten naar YAML.</p><pre><code class=language-ncl data-lang=ncl>{
+  groups = [
+    {
+      name = &quot;mycompany&quot;,
+      rules = [
+        {
+          alert = &quot;aws_documentdb_freeable_memory_low&quot;,
+          expr = m%&quot;
+            16 /
+            (aws_docdb_freeable_memory_average{dbinstance_identifier=&quot;tf-created-AABBCCDD&quot;} / (1024^3))
+            * 100 &lt; 25
+          &quot;%,
+          for = &quot;10m&quot;,
+          labels = {
+            team = &quot;devops&quot;,
+            platform = &quot;aws&quot;
+          },
+          annotations = {
+            description = &quot;DocumentDB = the instance has less then 25% freeable freeable memory.&quot;,
+            summary = &quot;DocumentDB is has low freeable memory&quot;,
+            jira_ticket = &quot;aws-devops&quot;,
+            severity = &quot;2&quot;,
+            }
+          },
+          {
+            alert = &quot;aws_documentdb_cpu_usage_too_high&quot;,
+            expr = &quot;aws_docdb_cpuutilization_average &gt; 90&quot;,
+            for = &quot;10m&quot;,
+            labels = {
+              team = &quot;devops&quot;,
+              platform = &quot;aws&quot;
+            },
+            annotations = {
+              summary = &quot;DocumentDB is reaching its cpu limit&quot;,
+              description = &quot;DocumentDB = the instance are using more than 90% of the cpu assigned&quot;,
+              jira_ticket = &quot;aws-devops&quot;,
+              severity = 2
+            }
+          }
+        ]
+      }
+    ]
+  }
+</code></pre><p>Hierboven staat een statische versie van de YAML in Nickel. Direct herkenbaar.
+Een soort JSON maar dan met <code>=</code> ipv <code>:</code>. Je ziet ook meteen een voorbeeld om
+strings op meerdere regels te plaatsten met de <code>m%"Hello hello.\nText on a new line"%</code> schrijfwijze.</p><p>Als je dit bestand opslaat als b01-prometheus-rules.ncl kun je het naar YAML
+exporteren het commando:</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash>nickel -f b02-prometheus-rules.ncl export --format yaml
+</code></pre></div><p>Uiteraard kun je dit opslaan in een bestand door <code>> prometheus-rules.yml</code> aan de
+commandoregel toe te voegen.</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash>nickel -f b02-prometheus-rules.ncl export --format yaml &gt; prometheus-rules.yml
+</code></pre></div><p>We gaan nu grote stap maken door een functie te introduceren.</p><blockquote><p>Het je Nickel nog niet geïnstalleerd? Lees de <a href=https://nickel-lang.org/getting-started/>Getting Started pagina op
+nickel-lang.org</a></p><p>Ben je een Mac-gebruiker? <code>brew install nickel</code>.</p></blockquote><h2 id=stap-2-een-functie-voor-de-alert-definitie>Stap 2: Een functie voor de alert-definitie.</h2><p>We maken een functie met als invoer de naam, de teksten die de problemen
+omschrijven, de tijdsduur, de expressie en de severity. Vervolgens roepen we
+de functie aan in het regels blok. Ook deze code kunnen we omzetten naar YAML
+met het commando <code>nickel</code>.</p><pre><code class=language-ncl data-lang=ncl>let alert_rule = fun name problem_txt_short problem_txt_long duration sev expression =&gt; {
+  alert = name,
+  expr = expression,
+  for = duration,
+  labels = {
+    team = &quot;devops&quot;,
+    platform = &quot;aws&quot;
+  },
+  anotations = {
+    summary = &quot;%{problem_txt_short}&quot;,
+    description = &quot;%{problem_txt_long}&quot;,
+    severity = std.string.from_number sev,
+    }
+} in
+
+{
+  groups = [
+    {
+      name = &quot;mycompany&quot;,
+      rules = [
+        alert_rule &quot;documentdb_freeable_memory_low&quot; &quot;DocumentDB freeable memory low&quot; &quot;DocumentDB: the instance has less then 25% freeable freeable memory.&quot; &quot;10m&quot; 2 m%&quot;
+          16 /
+          (aws_docdb_freeable_memory_average{dbinstance_identifier=&quot;tf-created-AABBCCDD&quot;} / (1024^3))
+          * 100 &lt; 25
+        &quot;%,
+
+        alert_rule &quot;documentdb_cpu_usage_too_high&quot; &quot;DocumentDB cpu usage too high&quot; &quot;DocumentDB: the instance are using more than 90% of the cpu assigned&quot; &quot;10m&quot; 2 m%&quot;
+          aws_docdb_cpuutilization_average &gt; 90
+        &quot;%
+      ]
+    }
+  ]
+}
+</code></pre><p>Even puzzelen wat hier gebeurt. <code>let alert_rule = fun ...=> {} in</code> definieert
+een functie, wijst deze toe aan de variabele <code>alert_rule</code>. De functie geeft in
+dit geval een object of anders gezegd een dictionary terug. Vervolgens start de
+daadwerkelijke opbouw van de uitvoer. In het blok <code>rules = [...]</code> wordt de
+functie twee keer aangeroepen, elke alert definitie.</p><p>De oorspronkelijke YAML is 28 regels, de eerste Nickel conversie was 43 regels
+en nu zijn we al weer terug naar 33 regels. Nog een of twee alert definities en
+ons bestand is al ruim compacter dan oorspronkelijk uitgeschreven YAML.</p><p>Het is wel even wennen hoe je functies definieert in Nickel. Nickel is
+geïnspireerd op talen zoals <a href=https://www.haskell.org/>Haskell</a> en
+<a href=https://nixos.org/manual/nix/stable/>Nix</a> en dit zijn functionele talen.
+Vooral mensen met gevoel voor wiskunde voelen zich snel thuis in functionele
+talen. Persoonlijk ben ik een meer een alpha-mens en dol op talen met veel
+syntactic sugar zoals mijn lievelingstaal <a href=https://www.ruby-lang.org/en/>Ruby</a>.</p><p>In de volgende stap maken we nog een laatste optimalisatieslag om het leven van
+de devops&rsquo;er echt makkelijker te maken.</p><h2 id=stap-3-puntjes-op-de-i>Stap 3: Puntjes op de i</h2><p>Als je naar de teksten kijkt zie je dat de alertnaam de korte en de lange
+omschrijving veel terugkerende woorden heeft. Eigenlijk zou de alertnaam
+genereert kunnen worden op basis van een service-naam plus de korte
+omschrijving. Ook in de korte en lange omschrijving kunnen de service-naam
+hergebruiken.</p><pre><code class=language-ncl data-lang=ncl>let normalize_string = fun instring =&gt; std.string.replace_regex &quot;[%,.]+&quot; &quot;&quot; (std.string.replace &quot; &quot; &quot;_&quot; (std.string.lowercase instring)) in
+
+let alert_rule = fun service_name problem_txt_short problem_txt_long duration sev expression =&gt; {
+
+  alert = &quot;%{normalize_string service_name}_%{normalize_string problem_txt_short}&quot;,
+  expr = expression,
+  for = duration,
+  labels = {
+    team = &quot;devops&quot;,
+    platform = &quot;aws&quot;
+  },
+  annotations = {
+    summary = &quot;%{service_name} is unhealty. %{problem_txt_short}&quot;,
+    description = &quot;%{service_name} is unhealty. %{problem_txt_long} For at least %{duration}.&quot;,
+    severity = std.string.from_number sev,
+    }
+} in
+
+{
+  groups = [
+    {
+      name = &quot;mycompany&quot;,
+      rules = [
+        alert_rule &quot;DocumentDB&quot; &quot;freeable memory low&quot; &quot;The instance has less then 25% freeable memory.&quot; &quot;10m&quot; 2 m%&quot;
+          16 /
+          (aws_docdb_freeable_memory_average{dbinstance_identifier=&quot;tf-created-AABBCCDD&quot;} / (1024^3))
+          * 100 &lt; 25
+        &quot;%,
+
+        alert_rule &quot;DocumentDB&quot; &quot;cpu usage too high&quot; &quot;The instance are using more than 90% of the cpu assigned.&quot; &quot;10m&quot; 2 m%&quot;
+          aws_docdb_cpuutilization_average &gt; 90
+        &quot;%
+      ]
+    }
+  ]
+}
+</code></pre><p>We hebben een nieuwe functie geïntroduceerd <code>normalize_string</code>. Deze gebruiken
+we om de naam van de alert te genereren. We halen evt. verkeerde tekens eruit,
+vervangen spaties met underscores en maken de naam lowercase. Vervolgens
+hergebruiken we de <em>Service Naam</em> <code>DocumentDB</code> in de probleemomschrijvingen.
+Deze kleine verbeteringen zorgen voor efficiëntere functie aanroepingen en meer
+consistente en bruikbaar Alert informatie.</p><h2 id=conclusie>Conclusie</h2><p>Door onze Prometheus Alerts in een paar stappen om te schrijven naar Nickel,
+hebben we diverse verbeteringen bereikt.</p><ul><li>Onze broncode is compacter geworden en heeft vrijwel geen overbodige tekens of tekst.</li><li>Dubbele broncode zijn we grotendeel kwijtgeraakt.</li><li>Het schrijven van nieuwe alerts gaat veel sneller.</li><li>De broncode is minder gevoelig voor typefouten die kunnen ontstaan door het kopieren en plakken van eerdere definities.</li><li>Door gebruik te maken van een functie lopen we minder risico op configuratie drift.</li></ul><p>We hadden ook Python of een andere algemene programmeertaal kunnen gebruiken.
+Dit vereist echter veel boilerplate code, en vereist daarnaast behoorlijk wat
+documentatie om anderen mee te laten draaien in de workflow.</p><p>Nickel is speciaal geschreven met als doel JSON en YAML configuratie-standen
+slimmer te genereren. Conversie naar YAML vereist een enkel commando en kan
+makkelijk worden opgenomen in een Makefile of Pipeline.</p><p>Uiteraard kunnen we nog meer verbeteren. We kunnen een pipeline maken met een
+Nickel linter, we kunnen de functies importeren uit een gedeeld library bestand
+zodat andere projecten deze ook kunnen gebruiken etc..</p><p>Wat ik graag wilde laten zien dat het in veel gevallen verstandig is YAML of
+JSON configuraties te genereren met een taal zoals Nickel. En persoonlijk ben
+ik na wat spelen erg gesteld geraakt op de syntax van Nickel. Ik er zeker meer
+gebruik van maken.</p><p>Zie je een fout of wil je graag om een andere reden reageren. Gebruik het
+formulier hieronder.</p><p>De bestanden uit deze tutorial kun je downloaden in de <a href>git-repo</a> die bij dit
+artikel hoort.</p><h2 id=links>Links</h2><ul><li><a href=https://nickel-lang.org>nickel-lang.org</a> - The Nickel Home Page with general information and documentation.</li><li><a href=https://www.tweag.io/blog/2023-05-17-nickel-1.0-release>Announcing Nickel 1.0</a> - The Nickel 1.0 release announcement with some code examples.</li><li><a href=https://github.com/tweag/nickel/discussions/categories/q-a>Nickel Q & A</a> - This is the place to ask for help.</li></ul></div><p><a href="https://pimsnel.nl/pagina/reageer?artikel=Prometheus%20Alert%20Rules%20schrijven%20met%20Nickel">Stuur me een reactie over dit artikel</a></p></div></div></div></main><div class=footer><img class=pim-linksonder src=https://pimsnel.nl/images/logo-pimsnel-com.png alt="logo Pim Snel"><div class=container-fluid><div class=col-sm-4>© 2019</div><div class=col-sm-4></div><div class=col-sm-4></div></div><img class=pim-rechtsonder src=https://pimsnel.nl/images/pim-rechtsonder.png alt="logo Pim Snel"></div><script src=https://pimsnel.nl/main.dc43b.js></script><script async defer data-website-id=70fae379-e1e5-4e9a-99cc-45bffd7a10f8 src=https://umami.poppygo.io/umami.js></script></body></html>

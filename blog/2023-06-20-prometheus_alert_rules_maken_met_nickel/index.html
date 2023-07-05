@@ -215,4 +215,55 @@ JSON configuraties te genereren met een taal zoals Nickel. En persoonlijk ben
 ik na wat spelen erg gesteld geraakt op de syntax van Nickel. Ik er zeker meer
 gebruik van maken.</p><p>Zie je een fout of wil je graag om een andere reden reageren. Gebruik het
 formulier hieronder.</p><p>De bestanden uit deze tutorial kun je downloaden in de <a href>git-repo</a> die bij dit
-artikel hoort.</p><h2 id=links>Links</h2><ul><li><a href=https://nickel-lang.org>nickel-lang.org</a> - The Nickel Home Page with general information and documentation.</li><li><a href=https://www.tweag.io/blog/2023-05-17-nickel-1.0-release>Announcing Nickel 1.0</a> - The Nickel 1.0 release announcement with some code examples.</li><li><a href=https://github.com/tweag/nickel/discussions/categories/q-a>Nickel Q & A</a> - This is the place to ask for help.</li></ul></div><p><a href="https://pimsnel.nl/pagina/reageer?artikel=Prometheus%20Alert%20Rules%20schrijven%20met%20Nickel">Stuur me een reactie over dit artikel</a></p></div></div></div></main><div class=footer><img class=pim-linksonder src=https://pimsnel.nl/images/logo-pimsnel-com.png alt="logo Pim Snel"><div class=container-fluid><div class=col-sm-4>© 2019</div><div class=col-sm-4></div><div class=col-sm-4></div></div><img class=pim-rechtsonder src=https://pimsnel.nl/images/pim-rechtsonder.png alt="logo Pim Snel"></div><script src=https://pimsnel.nl/main.dc43b.js></script><script async defer data-website-id=70fae379-e1e5-4e9a-99cc-45bffd7a10f8 src=https://umami.poppygo.io/umami.js></script></body></html>
+artikel hoort.</p><h2 id=update-met-code-verbeteringen>Update met code verbeteringen</h2><p>Supercool! Yann Hamdaoui, de hoofdontwikkelaar van Nickel, gaf naar aanleiding
+van dit blog artikel een reactie met aantal suggesties ter verbetering van de Nickel code
+voorbeelden. Yann&rsquo;s suggesties laten geavanceerdere mogelijkheden van Nickel
+zien, zoals het gebruiken van de <em>reverse application operator</em> <code>|></code>, <em>type
+casting</em>, het omschrijven van functies naar <em>bare records</em>, <em>contracts</em>, en hij
+stelt ook voor een <em>record</em> als functie parameter te gebruiken in plaats van losse
+parameters.</p><p>Hieronder toon ik een laatste refactoring waarbij ik de <em>reverse applicatie
+operator</em> toepas. Om dit artikel leesbaar voor instappers te houden verwijs ik
+je voor de overige verbeteringen van harte door naar <a href=https://github.com/tweag/nickel/discussions/1386#discussioncomment-6240266>Yann&rsquo;s reactie op de
+nickel project pagina</a>.</p><pre><code class=language-ncl data-lang=ncl># Using the &quot;reverse application operator&quot;
+let normalize_string = fun instring =&gt;
+  instring
+  |&gt; std.string.lowercase
+  |&gt; std.string.replace &quot; &quot; &quot;_&quot;
+  |&gt; std.string.replace_regex &quot;[%,.]+&quot; &quot;&quot;
+in
+
+let alert_rule = fun service_name problem_txt_short problem_txt_long duration sev expression =&gt; {
+
+  alert = &quot;%{normalize_string service_name}_%{normalize_string problem_txt_short}&quot;,
+  expr = expression,
+  for = duration,
+  labels = {
+    team = &quot;devops&quot;,
+    platform = &quot;aws&quot;
+  },
+  annotations = {
+    summary = &quot;%{service_name} is unhealty. %{problem_txt_short}&quot;,
+    description = &quot;%{service_name} is unhealty. %{problem_txt_long} For at least %{duration}.&quot;,
+    severity = std.string.from_number sev,
+    }
+} in
+
+{
+  groups = [
+    {
+      name = &quot;mycompany&quot;,
+      rules = [
+        alert_rule &quot;DocumentDB&quot; &quot;freeable memory low&quot; &quot;The instance has less then 25% freeable memory.&quot; &quot;10m&quot; 2 m%&quot;
+          16 /
+          (aws_docdb_freeable_memory_average{dbinstance_identifier=&quot;tf-created-AABBCCDD&quot;} / (1024^3))
+          * 100 &lt; 25
+        &quot;%,
+
+        alert_rule &quot;DocumentDB&quot; &quot;cpu usage too high&quot; &quot;The instance are using more than 90% of the cpu assigned.&quot; &quot;10m&quot; 2 m%&quot;
+          aws_docdb_cpuutilization_average &gt; 90
+        &quot;%
+      ]
+    }
+  ]
+}
+</code></pre><h2 id=links>Links</h2><ul><li><a href=https://nickel-lang.org>nickel-lang.org</a> - The Nickel Home Page with general information and documentation.</li><li><a href=https://www.tweag.io/blog/2023-05-17-nickel-1.0-release>Announcing Nickel 1.0</a> - The Nickel 1.0 release announcement with some code examples.</li><li><a href=https://github.com/tweag/nickel/discussions/categories/q-a>Nickel Q & A</a> - This is the place to ask for help.</li></ul></div><p><a href="https://pimsnel.nl/pagina/reageer?artikel=Prometheus%20Alert%20Rules%20schrijven%20met%20Nickel">Stuur me een reactie over dit artikel</a></p></div></div></div></main><div class=footer><img class=pim-linksonder src=https://pimsnel.nl/images/logo-pimsnel-com.png alt="logo Pim Snel"><div class=container-fluid><div class=col-sm-4>© 2019</div><div class=col-sm-4></div><div class=col-sm-4></div></div><img class=pim-rechtsonder src=https://pimsnel.nl/images/pim-rechtsonder.png alt="logo Pim Snel"></div><script src=https://pimsnel.nl/main.dc43b.js></script><script async defer data-website-id=70fae379-e1e5-4e9a-99cc-45bffd7a10f8 src=https://umami.poppygo.io/umami.js></script></body></html>

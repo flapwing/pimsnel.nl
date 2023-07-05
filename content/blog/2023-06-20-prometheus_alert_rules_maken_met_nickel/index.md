@@ -338,6 +338,67 @@ formulier hieronder.
 De bestanden uit deze tutorial kun je downloaden in de [git-repo]() die bij dit
 artikel hoort.
 
+## Update met code verbeteringen
+
+Supercool! Yann Hamdaoui, de hoofdontwikkelaar van Nickel, gaf naar aanleiding
+van dit blog artikel een reactie met aantal suggesties ter verbetering van de Nickel code
+voorbeelden. Yann's suggesties laten geavanceerdere mogelijkheden van Nickel
+zien, zoals het gebruiken van de _reverse application operator_ `|>`, _type
+casting_, het omschrijven van functies naar _bare records_, _contracts_, en hij
+stelt ook voor een _record_ als functie parameter te gebruiken in plaats van losse
+parameters.
+
+Hieronder toon ik een laatste refactoring waarbij ik de _reverse applicatie
+operator_ toepas. Om dit artikel leesbaar voor instappers te houden verwijs ik
+je voor de overige verbeteringen van harte door naar [Yann's reactie op de
+nickel project pagina](https://github.com/tweag/nickel/discussions/1386#discussioncomment-6240266).
+
+```ncl
+# Using the "reverse application operator"
+let normalize_string = fun instring =>
+  instring
+  |> std.string.lowercase
+  |> std.string.replace " " "_"
+  |> std.string.replace_regex "[%,.]+" ""
+in
+
+let alert_rule = fun service_name problem_txt_short problem_txt_long duration sev expression => {
+
+  alert = "%{normalize_string service_name}_%{normalize_string problem_txt_short}",
+  expr = expression,
+  for = duration,
+  labels = {
+    team = "devops",
+    platform = "aws"
+  },
+  annotations = {
+    summary = "%{service_name} is unhealty. %{problem_txt_short}",
+    description = "%{service_name} is unhealty. %{problem_txt_long} For at least %{duration}.",
+    severity = std.string.from_number sev,
+    }
+} in
+
+{
+  groups = [
+    {
+      name = "mycompany",
+      rules = [
+        alert_rule "DocumentDB" "freeable memory low" "The instance has less then 25% freeable memory." "10m" 2 m%"
+          16 /
+          (aws_docdb_freeable_memory_average{dbinstance_identifier="tf-created-AABBCCDD"} / (1024^3))
+          * 100 < 25
+        "%,
+
+        alert_rule "DocumentDB" "cpu usage too high" "The instance are using more than 90% of the cpu assigned." "10m" 2 m%"
+          aws_docdb_cpuutilization_average > 90
+        "%
+      ]
+    }
+  ]
+}
+```
+
+
 ## Links
 
 - [nickel-lang.org](https://nickel-lang.org) - The Nickel Home Page with general information and documentation.

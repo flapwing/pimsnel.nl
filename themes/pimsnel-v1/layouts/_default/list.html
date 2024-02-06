@@ -39,12 +39,21 @@
 
     <div class="col-md-3">
 
-      <h3>Categorieën</h3>
+      <h3>Languages</h3>
+      <ul>
+        <li><a href="/categories/english/">English</a></li>
+        <li><a href="/categories/nederlands/">Nederlands</a></li>
+      </ul>
+      <!--
+      <h3>Cat's</h3>
       <ul>
         {{ range .Site.Taxonomies.categories }}
+        {{ if and ( ne .Page.Title "english") (ne .Page.Title "nederlands")}}
         <li><a href="{{ .Page.RelPermalink }}">{{ .Page.Title }}</a></li>
         {{ end }}
+        {{ end }}
       </ul>
+      -->
 
     </div>
 

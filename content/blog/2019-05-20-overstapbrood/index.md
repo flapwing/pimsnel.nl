@@ -3,6 +3,7 @@ categories:
   - eten
   - brood
   - recept
+  - nederlands
 date: '2019-05-20T00:00:00.000Z'
 draft: false
 image: imgs/overstapbrood.jpg
@@ -30,20 +31,28 @@ recept:
       kostprijs: 0.0025
       leverancier: Sligro
       product: bloem van durum
+      verberg: false
+      andere_plusfactor: 0
     - basishoeveelheid: 5
       eenheid: gram
       kostprijs: 0.00105
       leverancier: Ekoplaza
       product: zeezout fijn
+      verberg: false
+      andere_plusfactor: 0
     - basishoeveelheid: 150
       eenheid: gram
       kostprijs: 0
       product: water
+      verberg: false
+      andere_plusfactor: 0
     - basishoeveelheid: 5
       eenheid: gram
       kostprijs: 0.0104
       leverancier: De Welkoop
       product: gist
+      verberg: false
+      andere_plusfactor: 0
     - andere_plusfactor: 0.2
       basishoeveelheid: 2
       eenheid: Kwh
@@ -53,9 +62,9 @@ recept:
   tijd:
     bereidingstijd: min. 2 uur
     werktijd: 15 minuten
-resources: []
 title: Overstapbrood
 type: recept
+subtitle: ''
 
 ---
 

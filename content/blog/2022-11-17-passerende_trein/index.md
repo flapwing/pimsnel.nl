@@ -8,6 +8,7 @@ image: imgs/trajno.png
 categories:
   - trajno
   - Passing Train Methodology
+  - nederlands
 recept:
   tijd:
     bereidingstijd: ''

@@ -8,6 +8,7 @@ image: imgs/seed_565023_00002.png
 categories:
   - aws
   - terraform
+  - nederlands
 recept:
   tijd:
     bereidingstijd: ''

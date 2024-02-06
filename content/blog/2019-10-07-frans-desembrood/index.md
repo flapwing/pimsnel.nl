@@ -3,6 +3,7 @@ categories:
   - eten
   - brood
   - recept
+  - nederlands
 date: '2019-10-07T00:00:00.000Z'
 draft: false
 image: imgs/tienminutenbrood.png
@@ -59,9 +60,9 @@ recept:
   tijd:
     bereidingstijd: 8 tot 10 uur
     werktijd: 15 minuten
-resources: []
 title: Frans wit desembrood
 type: recept
+subtitle: ''
 
 ---
 

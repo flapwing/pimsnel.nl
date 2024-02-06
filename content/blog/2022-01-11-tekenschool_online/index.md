@@ -4,6 +4,7 @@ categories:
   - poppygo
   - hugo
   - tekenschool-online
+  - nederlands
 draft: false
 image: imgs/tekenschool-online-1.png
 pubdate: '2022-01-11'
@@ -18,7 +19,6 @@ recept:
   tijd:
     bereidingstijd: ''
     werktijd: ''
-resources: []
 subtitle: Nieuwe project. Online les en leerprogramma voor kinderen
 title: Tekenschool Online
 type: artikel

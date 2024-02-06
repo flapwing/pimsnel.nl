@@ -8,6 +8,7 @@ image: imgs/nickel-golden-tinge.jpg
 categories:
   - nickel
   - tutorial
+  - nederlands
 recept:
   tijd:
     bereidingstijd: ''

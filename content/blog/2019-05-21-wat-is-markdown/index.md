@@ -3,14 +3,25 @@ categories:
   - technologie
   - schrijven
   - Markdown
+  - nederlands
 date: '2019-05-21T00:00:00.000Z'
 draft: false
 image: imgs/wat-is-markdown-feature.png
 pubdate: 2020-8-18
-resources: []
 subtitle: Introductie van Markdown voor niet-technische schrijvers
 title: Wat is Markdown?
 type: artikel
+recept:
+  tijd:
+    bereidingstijd: ''
+    werktijd: ''
+  ingrediënten: []
+  calculator:
+    plusfactor: 0
+    start: 0
+    end: 0
+    meervoud: ''
+    enkelvoud: ''
 
 ---
 

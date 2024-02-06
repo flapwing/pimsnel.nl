@@ -1,5 +1,6 @@
 ---
-categories: []
+categories:
+  - nederlands
 draft: false
 image: ''
 pubdate: '2022-01-27'
